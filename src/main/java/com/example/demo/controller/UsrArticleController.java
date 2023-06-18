@@ -32,6 +32,7 @@ public class UsrArticleController {
 		}
 	}
 	
+	// 서비스 메소드
 	private Article writeArticle(String title, String body) {
 		int id = this.lastArticleId + 1;
 		this.lastArticleId = id;
@@ -42,8 +43,27 @@ public class UsrArticleController {
 		
 		return article;
 	}
+	
+	private Article getArticleById(int id) {
+		
+		for (Article article : articles) {
+			if (article.getId() == id) {
+				return article;
+			}
+		}
+		
+		return null;
+	}
 
-	@RequestMapping("/usr/home/main")
+	private void deleteArticle(int id) {
+		
+		Article article = getArticleById(id);
+		
+		articles.remove(article);
+	}
+	
+	// 액션 메소드
+	@RequestMapping("/usr/article/doAdd")
 	@ResponseBody
 	public Article doAdd(String title, String body) {
 		
@@ -58,4 +78,21 @@ public class UsrArticleController {
 	public List<Article> getArticles() {
 		return this.articles;
 	}
+	
+	@RequestMapping("/usr/home/doDelete")
+	@ResponseBody
+	public String doDelete(int id) {
+		
+		Article foundArticle = getArticleById(id);
+		
+		if (foundArticle == null) {
+			return id + "번 게시글이 존재하지 않습니다";
+		}
+		
+		deleteArticle(id);
+		
+		return id + "번 게시글이 삭제되었습니다.";
+	}
+
+
 }
