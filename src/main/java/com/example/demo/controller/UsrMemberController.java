@@ -53,7 +53,11 @@ public class UsrMemberController {
 	
 	@RequestMapping("/usr/member/doLogin")
 	@ResponseBody
-	public ResultData<Member> doLogin(HttpSession session, String loginId, String loginPw) {
+	public ResultData doLogin(HttpSession session, String loginId, String loginPw) {
+		
+		if(session.getAttribute("loginedMemberId") != null) {
+			return ResultData.from("F-A", "로그아웃 후 이용해주세요");
+		}
 		
 		if(Util.empty(loginId)) {
 			return ResultData.from("F-1", "아이디를 입력해주세요");
@@ -62,21 +66,31 @@ public class UsrMemberController {
 			return ResultData.from("F-2", "비밀번호를 입력해주세요");
 		}
 		
-		ResultData<Member> doRoginRd = memberService.doLogin(session, loginId, loginPw);
+		Member member = memberService.getMemberByLoginId(loginId);
 		
-		return doRoginRd;
+		if (member == null) {
+			return ResultData.from("F-3", Util.f("%s은(는) 존재하지 않는 아이디입니다", loginId));
+		}
+		
+		if (member.getLoginPw().equals(loginPw) == false) {
+			return ResultData.from("F-4", "비밀번호가 일치하지 않습니다");
+		}
+
+		session.setAttribute("loginedMemberId", member.getId());
+		
+		return ResultData.from("S-1", Util.f("%s님 환영합니다~", member.getNickname()));
 	}
 	
 	@RequestMapping("/usr/member/doLogout")
 	@ResponseBody
 	public ResultData doLogout(HttpSession session) {
 		
-		if(session.getAttribute("loginedMember") == null) {
-			return ResultData.from("F-1", "현재 로그인상태가 아닙니다.");
+		if(session.getAttribute("loginedMemberId") == null) {
+			return ResultData.from("F-A", "로그인 후 이용해주세요");
 		}
 		
-		session.removeAttribute("loginedMember");
+		session.removeAttribute("loginedMemberId");
 		
-		return ResultData.from("S-1", "로그아웃 되었습니다.");
+		return ResultData.from("S-1", "정상적으로 로그아웃 되었습니다");
 	}
 }
