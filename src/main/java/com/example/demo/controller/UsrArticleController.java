@@ -76,7 +76,11 @@ public class UsrArticleController {
 	
 	@RequestMapping("/usr/article/doModify")
 	@ResponseBody
-	public ResultData doModify(int id, String title, String body) {
+	public ResultData<Article> doModify(HttpSession session, int id, String title, String body) {
+		
+		if(session.getAttribute("loginedMemberId") == null) {
+			return ResultData.from("F-A", "로그인 후 이용해주세요");
+		}
 		
 		Article foundArticle = articleService.getArticleById(id);
 		
@@ -84,19 +88,31 @@ public class UsrArticleController {
 			return ResultData.from("F-1", Util.f("%d번 게시글은 존재하지 않습니다", id));
 		}
 		
-		articleService.modifyArticle(id, title, body);
+		ResultData actorCanModifyRd = articleService.actorCanModifyRd((int) session.getAttribute("loginedMemberId"), foundArticle.getMemberId());
 		
-		return ResultData.from("S-1", Util.f("%d번 게시글을 수정했습니다", id));
+		if (actorCanModifyRd.isFail()) {
+			return actorCanModifyRd;
+		}
+		
+		return articleService.modifyArticle(id, title, body);
 	}
 
 	@RequestMapping("/usr/article/doDelete")
 	@ResponseBody
-	public ResultData doDelete(int id) {
+	public ResultData doDelete(HttpSession session, int id) {
+		
+		if(session.getAttribute("loginedMemberId") == null) {
+			return ResultData.from("F-A", "로그인 후 이용해주세요");
+		}
 		
 		Article foundArticle = articleService.getArticleById(id);
 		
 		if (foundArticle == null) {
 			return ResultData.from("F-1", Util.f("%d번 게시글은 존재하지 않습니다", id));
+		}
+		
+		if((int) session.getAttribute("loginedMemberId") != foundArticle.getMemberId()) {
+			return ResultData.from("F-B", "해당 게시글에 대한 권한이 없습니다.");
 		}
 		
 		articleService.deleteArticle(id);
