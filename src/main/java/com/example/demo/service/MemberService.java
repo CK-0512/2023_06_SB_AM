@@ -42,7 +42,7 @@ public class MemberService {
 		
 		memberDao.doJoin(loginId, loginPw, name, nickname, cellphoneNum, email);
 		
-		return ResultData.from("S-1", Util.f("%s회원님이 가입되었습니다", nickname), getMemberById(getLastInsertId()));
+		return ResultData.from("S-1", Util.f("%s회원님이 가입되었습니다", nickname), "member", getMemberById(getLastInsertId()));
 	}
 
 	private Member getMemberByNameAndEmail(String name, String email) {
@@ -79,7 +79,7 @@ public class MemberService {
 		
 		session.setAttribute("loginedMember", loginedMember);
 		
-		return ResultData.from("S-1", "로그인 성공", loginedMember);
+		return ResultData.from("S-1", "로그인 성공", "member", loginedMember);
 		
 	}
 
