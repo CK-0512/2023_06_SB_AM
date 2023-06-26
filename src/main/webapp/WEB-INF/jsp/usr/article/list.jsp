@@ -1,25 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>ARTICLE LIST</title>
-</head>
-<body>
 
-	<div>
-		<a href="/">로고</a>
-		<ul>
-			<li><a href="/">HOME</a></li>
-			<li><a href="/usr/article/list">LIST</a></li>
-		</ul>
-	</div>
+<c:set var="pageTitle" value="List" />
+<%@ include file="../common/head.jsp" %>
 
 	<h1>게시물 리스트</h1>
 
-	<table border="1">
+	<table>
 		<thead>
 			<tr>
 				<th>번호</th>
@@ -40,5 +28,4 @@
 		</tbody>
 	</table>
 
-</body>
-</html>
+<%@ include file="../common/foot.jsp" %>
