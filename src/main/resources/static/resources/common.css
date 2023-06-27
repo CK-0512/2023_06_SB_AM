@@ -1,7 +1,19 @@
 @charset "UTF-8";
 
+@font-face {
+    font-family: 'OTWelcomeRA';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2110@1.0/OTWelcomeRA.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html > body {
+	font-family: 'OTWelcomeRA', sans-serif;
+	text-underline-position: under;
+}
+
 .table-box-type-1 > table {
-	width : 100%
+	width : 100%;
 }
 
 
@@ -9,4 +21,13 @@
 	border: 1px solid black;
 	padding: 10px;
 	text-align: center;
+}
+
+.btn-text-link {
+	color: black;
+}
+
+.btn-text-link:hover {
+	color: red;
+	text-decoration: underline;
 }

@@ -22,10 +22,20 @@
 			WHERE id = #{id}
 	</select>
 	
+	<select id="getForPrintArticle" resultType="Article">
+		SELECT a.*, m.nickname AS `writerName`
+			FROM article AS a
+			INNER JOIN `member` AS m
+			on a.memberId = m.Id
+			WHERE A.id = #{id}
+	</select>
+	
 	<select id="getArticles" resultType="Article">
-		SELECT *
-			FROM article
-			ORDER BY id DESC
+		SELECT a.*, m.nickname AS `writerName`
+			FROM article AS a
+			INNER JOIN `member` AS m
+			on a.memberId = m.Id
+			ORDER BY A.id DESC
 	</select>
 	
 	<update id="modifyArticle">
