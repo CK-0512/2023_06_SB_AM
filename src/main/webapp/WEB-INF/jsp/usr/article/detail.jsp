@@ -42,8 +42,10 @@
 		</div>
 		<div>
 			<button class="btn-text-link" onclick="history.back()">뒤로가기</button>
-			<a class="btn-text-link" href="modify?id=${article.id }">수정</a>
-			<a class="btn-text-link" href="">삭제</a>
+			<c:if test="${loginedMemberId == article.memberId }">
+				<a class="btn-text-link" href="modify?id=${article.id }">수정</a>
+				<a class="btn-text-link" href="">삭제</a>
+			</c:if>
 		</div>
 	</div>
 </section>
