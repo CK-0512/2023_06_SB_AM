@@ -90,14 +90,13 @@ public class UsrArticleController {
 			return  Util.jsHistoryBack("%d번 게시글은 존재하지 않습니다");
 		}
 
-		ResultData actorCanModifyRd = articleService.actorCanModify((int) session.getAttribute("loginedMemberId"),
-				foundArticle.getMemberId());
-
-		if (actorCanModifyRd.isFail()) {
-			return actorCanModifyRd;
+		if ((int) session.getAttribute("loginedMemberId") != foundArticle.getMemberId()) {
+			return Util.jsHistoryBack("해당 게시글에 대한 권한이 없습니다.");
 		}
+		
+		articleService.modifyArticle(id, title, body);
 
-		return articleService.modifyArticle(id, title, body);
+		return Util.jsReplace(Util.f("%d번 게시글이 수정되었습니다.", id), Util.f("detail?id=%d", id));
 	}
 
 	@RequestMapping("/usr/article/doDelete")
