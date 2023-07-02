@@ -30,12 +30,9 @@ public class UsrArticleController {
 	@RequestMapping("/usr/article/doAdd")
 	@ResponseBody
 	public ResultData<Article> doAdd(HttpServletRequest req, String title, String body) {
+
 		Rq rq = (Rq) req.getAttribute("rq");
 		
-		if (rq.getLoginedMemberId() == 0) {
-			return ResultData.from("F-A", "로그인 후 이용해주세요");
-		}
-
 		if (Util.empty(title)) {
 			return ResultData.from("F-1", "제목을 입력해주세요");
 		}
@@ -63,61 +60,76 @@ public class UsrArticleController {
 
 	@RequestMapping("/usr/article/detail")
 	public String showDetail(HttpServletRequest req, Model model, int id) {
+
 		Rq rq = (Rq) req.getAttribute("rq");
 		
-		Article foundArticle = articleService.getForPrintArticle(id);
-		
-		model.addAttribute("article", foundArticle);
+		Article article = articleService.getForPrintArticle(id);
+
+		model.addAttribute("article", article);
 		model.addAttribute("loginedMemberId", rq.getLoginedMemberId());
 		
 		return "usr/article/detail";
+	}
+	
+	@RequestMapping("/usr/article/modify")
+	public String showModify(HttpServletRequest req, Model model, int id) {
+		
+		Rq rq = (Rq) req.getAttribute("rq");
+		
+		Article article = articleService.getForPrintArticle(id);
+		
+		if (article == null) {
+			return rq.jsReturnOnView(Util.f("%d번 게시글은 존재하지 않습니다", id));
+		}
+
+		if (rq.getLoginedMemberId() != article.getMemberId()) {
+			return rq.jsReturnOnView("해당 게시글에 대한 권한이 없습니다");
+		}
+		
+		model.addAttribute("article", article);
+		
+		return "usr/article/modify";
 	}
 
 	@RequestMapping("/usr/article/doModify")
 	@ResponseBody
 	public String doModify(HttpServletRequest req, int id, String title, String body) {
+
 		Rq rq = (Rq) req.getAttribute("rq");
 		
-		if (rq.getLoginedMemberId() == 0) {
-			return Util.jsHistoryBack("로그인 후 이용해주세요");
+		Article article = articleService.getArticleById(id);
+
+		if (article == null) {
+			return Util.jsHistoryBack(Util.f("%d번 게시글은 존재하지 않습니다", id));
 		}
 
-		Article foundArticle = articleService.getArticleById(id);
-
-		if (foundArticle == null) {
-			return  Util.jsHistoryBack("%d번 게시글은 존재하지 않습니다");
-		}
-
-		if (rq.getLoginedMemberId() != foundArticle.getMemberId()) {
-			return Util.jsHistoryBack("해당 게시글에 대한 권한이 없습니다.");
+		if (rq.getLoginedMemberId() != article.getMemberId()) {
+			return Util.jsHistoryBack("해당 게시글에 대한 권한이 없습니다");
 		}
 		
 		articleService.modifyArticle(id, title, body);
-
-		return Util.jsReplace(Util.f("%d번 게시글이 수정되었습니다.", id), Util.f("detail?id=%d", id));
+		
+		return Util.jsReplace(Util.f("%d번 게시글을 수정했습니다", id), Util.f("detail?id=%d", id));
 	}
 
 	@RequestMapping("/usr/article/doDelete")
 	@ResponseBody
 	public String doDelete(HttpServletRequest req, int id) {
+
 		Rq rq = (Rq) req.getAttribute("rq");
 		
-		if (rq.getLoginedMemberId() == 0) {
-			return Util.jsHistoryBack("로그인 후 이용해주세요");
+		Article article = articleService.getArticleById(id);
+
+		if (article == null) {
+			return Util.jsHistoryBack(Util.f("%d번 게시글은 존재하지 않습니다", id));
 		}
 
-		Article foundArticle = articleService.getArticleById(id);
-
-		if (foundArticle == null) {
-			return Util.jsHistoryBack(Util.f("%d번 게시글은 존재하지 않습니다.", id));
-		}
-
-		if (rq.getLoginedMemberId() != foundArticle.getMemberId()) {
-			return Util.jsHistoryBack("해당 게시글에 대한 권한이 없습니다.");
+		if (rq.getLoginedMemberId() != article.getMemberId()) {
+			return Util.jsHistoryBack("해당 게시글에 대한 권한이 없습니다");
 		}
 
 		articleService.deleteArticle(id);
 
-		return Util.jsReplace(Util.f("%d번 게시글을 삭제했습니다.", id), "list");
+		return Util.jsReplace(Util.f("%d번 게시글을 삭제했습니다", id), "list");
 	}
 }
