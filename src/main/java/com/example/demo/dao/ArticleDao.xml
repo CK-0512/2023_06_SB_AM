@@ -23,18 +23,22 @@
 	</select>
 	
 	<select id="getForPrintArticle" resultType="Article">
-		SELECT a.*, m.nickname AS `writerName`
-			FROM article AS a
-			INNER JOIN `member` AS m
-			on a.memberId = m.Id
+		SELECT A.*, M.nickname AS `writerName`
+			FROM article AS A
+			INNER JOIN `member` AS M
+			ON A.memberId = M.id
 			WHERE A.id = #{id}
 	</select>
 	
 	<select id="getArticles" resultType="Article">
-		SELECT a.*, m.nickname AS `writerName`
-			FROM article AS a
-			INNER JOIN `member` AS m
-			on a.memberId = m.Id
+		SELECT A.*, M.nickname AS `writerName`
+			FROM article AS A
+			INNER JOIN `member` AS M
+			ON A.memberId = M.id
+			WHERE 1 = 1
+			<if test="boardId != 0">
+				AND A.boardId = #{boardId}
+			</if>
 			ORDER BY A.id DESC
 	</select>
 	
