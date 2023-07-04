@@ -9,7 +9,7 @@ import com.example.demo.vo.Article;
 @Mapper
 public interface ArticleDao {
 	
-	public void writeArticle(int memberId, String title, String body);
+	public void writeArticle(int memberId, int boardId, String title, String body);
 
 	public Article getArticleById(int id);
 	
@@ -22,4 +22,6 @@ public interface ArticleDao {
 	public int getLastInsertId();
 
 	public Article getForPrintArticle(int id);
+
+	public int getArticlesCnt(int boardId);
 }

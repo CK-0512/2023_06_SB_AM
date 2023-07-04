@@ -8,6 +8,7 @@
 			SET regDate = NOW()
 				, updateDate = NOW()
 				, memberId = #{memberId}
+				, boardId = #{boardId}
 				, title = #{title}
 				, `body` = #{body}
 	</insert>
@@ -40,6 +41,12 @@
 				AND A.boardId = #{boardId}
 			</if>
 			ORDER BY A.id DESC
+	</select>
+	
+	<select id="getArticlesCnt" resultType="int">
+		SELECT COUNT(*)
+			FROM article
+			WHERE boardId = #{boardId}
 	</select>
 	
 	<update id="modifyArticle">

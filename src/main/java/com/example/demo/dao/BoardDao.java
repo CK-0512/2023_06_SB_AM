@@ -9,8 +9,10 @@ import com.example.demo.vo.Board;
 public interface BoardDao {
 
 	@Select("""
-			SELECT *
-				FROM board
+			SELECT b.*, a.COUNT(*) as totArticles
+				FROM board b
+				INNER JOIN article a
+				ON b.id = a.boardId
 				WHERE id = #{boardId}
 				AND delStatus = 0
 			""")

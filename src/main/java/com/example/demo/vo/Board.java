@@ -15,4 +15,5 @@ public class Board {
 	private String name;
 	private int delStatus;
 	private String delDate;
+	private int totArticles;
 }
