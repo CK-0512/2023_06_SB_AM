@@ -73,4 +73,8 @@ public class Rq {
 	}
 
 	public void init() {}
+
+	public String getParameter(String string) {
+		return String.valueOf(req.getParameter("page"));
+	}
 }
