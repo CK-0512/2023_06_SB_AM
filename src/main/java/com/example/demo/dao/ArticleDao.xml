@@ -38,28 +38,40 @@
 	</select>
 	
 	<select id="getArticles" resultType="Article">
-		SELECT A.*, M.nickname AS `writerName`
-			FROM article AS A
-			INNER JOIN `member` AS M
-			ON A.memberId = M.id
-			WHERE A.boardId = #{boardId}
-			<if test="searchKeyword != ''">
-				<choose>
-					<when test="searchKeywordType == 'title'">
-						AND A.title LIKE CONCAT('%', #{searchKeyword}, '%')
-					</when>
-					<when test="searchKeywordType == 'body'">
-						AND A.body LIKE CONCAT('%', #{searchKeyword}, '%')
-					</when>
-					<otherwise>
-						AND (
-							A.title LIKE CONCAT('%', #{searchKeyword}, '%')
-							OR A.body LIKE CONCAT('%', #{searchKeyword}, '%')
-						)
-					</otherwise>
-				</choose>
-			</if>
-			ORDER BY A.id DESC
+		WITH AM AS (
+			SELECT A.*
+            		, M.nickname AS `writerName`
+		        FROM article AS A
+		        INNER JOIN `member` AS M
+		        ON A.memberId = M.id
+		        WHERE A.boardId = #{boardId}
+				<if test="searchKeyword != ''">
+					<choose>
+						<when test="searchKeywordType == 'title'">
+							AND A.title LIKE CONCAT('%', #{searchKeyword}, '%')
+						</when>
+						<when test="searchKeywordType == 'body'">
+							AND A.body LIKE CONCAT('%', #{searchKeyword}, '%')
+						</when>
+						<otherwise>
+							AND (
+								A.title LIKE CONCAT('%', #{searchKeyword}, '%')
+								OR A.body LIKE CONCAT('%', #{searchKeyword}, '%')
+							)
+						</otherwise>
+					</choose>
+				</if>
+        )
+		SELECT AM.*
+		        , IFNULL(SUM(RP.point), 0) AS sumReactionPoint
+		        , SUM(IF(RP.point &gt; 0, RP.point, 0)) AS goodReactionPoint
+		        , SUM(IF(RP.point &lt; 0, RP.point, 0)) AS badReactionPoint
+			FROM AM
+			LEFT JOIN reactionPoint AS RP
+		    ON RP.relTypeCode = 'article'
+		    AND AM.id = RP.relId
+			GROUP BY AM.id
+			ORDER BY AM.id DESC
 			LIMIT #{limitStart}, #{itemsInAPage}
 	</select>
 	
