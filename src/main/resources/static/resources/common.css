@@ -1,33 +1,36 @@
-@charset "UTF-8";
+/* @charset "UTF-8"; */
 
 @font-face {
-    font-family: 'OTWelcomeRA';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2110@1.0/OTWelcomeRA.woff2') format('woff2');
+    font-family: 'GmarketSansMedium';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 html > body {
-	font-family: 'OTWelcomeRA', sans-serif;
-	text-underline-position: under;
+	font-family: 'GmarketSansMedium', sans-serif;
+	text-underline-position:under;
 }
 
 .table-box-type-1 > table {
-	width : 100%;
+	width: 100%;
 }
 
-
 .table-box-type-1 > table th, .table-box-type-1 > table td {
-	border: 1px solid black;
+	border:1px solid black;
 	padding: 10px;
 	text-align: center;
 }
 
 .btn-text-link {
-	color: black;
+	color:black;
 }
 
 .btn-text-link:hover {
-	color: red;
+	color:red;
 	text-decoration: underline;
+}
+
+.border-bottom-line {
+	border-bottom : 1px solid #d1c7c7;
 }

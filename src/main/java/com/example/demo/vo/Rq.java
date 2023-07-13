@@ -20,6 +20,8 @@ public class Rq {
 	
 	@Getter
 	private int loginedMemberId;
+	@Getter
+	private Member loginedMember;
 	
 	private HttpServletRequest req;
 	private HttpServletResponse resp;
@@ -33,14 +35,18 @@ public class Rq {
 		this.session = req.getSession();
 		
 		int loginedMemberId = 0;
+		Member loginedMember = null;
 		
 		if(session.getAttribute("loginedMemberId") != null) {
 			loginedMemberId = (int) session.getAttribute("loginedMemberId");
+			loginedMember = (Member) session.getAttribute("loginedMember");
 		}
 		
 		this.loginedMemberId = loginedMemberId;
+		this.loginedMember = loginedMember;
 		
 		this.req.setAttribute("rq", this);
+		
 	}
 
 	public void jsPrintHistoryBack(String msg) {
@@ -61,10 +67,12 @@ public class Rq {
 
 	public void login(Member member) {
 		this.session.setAttribute("loginedMemberId", member.getId());
+		this.session.setAttribute("loginedMember", member);
 	}
 
 	public void logout() {
 		this.session.removeAttribute("loginedMemberId");
+		this.session.removeAttribute("loginedMember");
 	}
 
 	public String jsReturnOnView(String msg) {
@@ -72,9 +80,7 @@ public class Rq {
 		return "usr/common/js";
 	}
 
-	public void init() {}
-
-	public String getParameter(String string) {
-		return String.valueOf(req.getParameter("page"));
+	public void init() {
+		
 	}
 }
