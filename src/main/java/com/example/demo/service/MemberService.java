@@ -1,7 +1,5 @@
 package com.example.demo.service;
 
-import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,22 +63,12 @@ public class MemberService {
 		return memberDao.getLastInsertId();
 	}
 
-	public ResultData<Member> doLogin(HttpSession session, String loginId, String loginPw) {
-		
-		Member loginedMember = getMemberByLoginId(loginId);
-		
-		if (loginedMember == null) {
-			return ResultData.from("F-3", Util.f("존재하지 않는 아이디(%s)입니다.", loginId));
-		}
-		
-		if (loginedMember.getLoginPw() != loginPw) {
-			return ResultData.from("F-4", "비밀번호가 일치하지 않습니다.");
-		}
-		
-		session.setAttribute("loginedMember", loginedMember);
-		
-		return ResultData.from("S-1", "로그인 성공", "member", loginedMember);
-		
+	public void doModify(int loginedMemberId, String nickname, String cellphoneNum, String email) {
+		memberDao.doModify(loginedMemberId, nickname, cellphoneNum, email);
+	}
+
+	public void doPasswordModify(int loginedMemberId, String loginPw) {
+		memberDao.doPasswordModify(loginedMemberId, loginPw);
 	}
 
 }
