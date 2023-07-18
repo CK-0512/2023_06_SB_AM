@@ -9,6 +9,9 @@
 	<div class="container mx-auto">
 		<div>lorem</div>
 		<div>안녕하세요</div>
+		<div>
+			<img src="/resources/images/고양이.jpg" />
+		</div>
 	</div>
 </section>
 
