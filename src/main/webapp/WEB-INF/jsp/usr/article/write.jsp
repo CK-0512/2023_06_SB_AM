@@ -4,10 +4,11 @@
 
 <c:set var="pageTitle" value="Write" />
 <%@ include file="../common/head.jsp" %>
+<%@ include file="../common/toastUiEditor.jsp" %>
 
 	<section class="mt-8">
 		<div class="container mx-auto">
-			<form action="doWrite" method="POST">
+			<form action="doWrite" onsubmit="submitForm(this); return false;" method="POST">
 				<div class="table-box-type-1">
 					<table class="table">
 						<colgroup>
@@ -34,7 +35,12 @@
 							</tr>
 							<tr>
 								<th>내용</th>
-								<td><textarea class="textarea textarea-accent w-full" name="body" placeholder="내용을 입력해주세요"></textarea></td>
+								<td>
+									<div class="toast-ui-editor">
+      									<script type="text/x-template"></script>
+    								</div>
+    								<input type="hidden" name="body"/>
+								</td>
 							</tr>
 							<tr>
 								<td colspan="2"><button class="btn btn-accent btn-sm">작성</button></td>
@@ -44,7 +50,7 @@
 				</div>
 			</form>
 			<div class="mt-2">
-				<button class="btn btn-accent btn-sm" onclick="history.back();">뒤로가기</button>
+				<a class="btn btn-accent btn-sm" onclick="history.back();">뒤로가기</a>
 			</div>
 		</div>
 	</section>
