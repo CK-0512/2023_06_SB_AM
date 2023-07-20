@@ -4,7 +4,7 @@
 
 <c:set var="pageTitle" value="Detail" />
 <%@ include file="../common/head.jsp" %>
-<%@ include file="../common/toastUiEditor.jsp" %>
+<%@ include file="../common/toastUIEditorLib.jsp" %>
 
 <script>
 	function getReactionPoint(){
@@ -84,7 +84,7 @@
 							<th>내용</th>
 							<td>
 								<div class="toast-ui-viewer">
-  									<script type="text/x-template">${article.getForPrintBody() }</script>
+  									<script type="text/x-template">${article.body }</script>
   								</div>
 							</td>
 						</tr>

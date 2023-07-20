@@ -4,12 +4,13 @@
 
 <c:set var="pageTitle" value="Modify" />
 <%@ include file="../common/head.jsp" %>
-<%@ include file="../common/toastUiEditor.jsp" %>
+<%@ include file="../common/toastUIEditorLib.jsp" %>
 
 	<section class="mt-8">
 		<div class="container mx-auto">
-			<form action="doModify" onsubmit="submitForm(this); return false;" method="POST">
+			<form action="doModify" method="POST" onsubmit="submitForm(this); return false;">
 				<input type="hidden" name="id" value="${article.id }" />
+				<input type="hidden" name="body" />
 				<div class="table-box-type-1">
 					<table class="table">
 						<colgroup>
@@ -40,9 +41,8 @@
 								<th>내용</th>
 								<td>
 									<div class="toast-ui-editor">
-      									<script type="text/x-template">${article.body }</script>
-    								</div>
-    								<input type="hidden" name="body"/>
+								    	<script type="text/x-template">${article.body }</script>
+								    </div>
 								</td>
 							</tr>
 							<tr>

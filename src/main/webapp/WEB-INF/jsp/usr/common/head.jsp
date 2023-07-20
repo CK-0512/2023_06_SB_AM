@@ -15,12 +15,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 <!-- 폰트어썸 불러오기 -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
-<link rel="stylesheet" href="/resources/common.css" />
-<script src="/resources/common.js" defer="defer"></script>
+<link rel="stylesheet" href="/resource/common.css" />
+<script src="/resource/common.js" defer="defer"></script>
 <title>${pageTitle }</title>
 </head>
 <body>
-	<div class="h-20 flex container mx-auto text-4xl">
+	<div class="h-20 flex container mx-auto text-3xl">
 		<a class="px-3 flex items-center" href="/"><span>로고</span></a>
 		<div class="flex-grow"></div>
 		<ul class="flex">
@@ -35,6 +35,7 @@
 				<li class="hover:underline"><a class="h-full px-3 flex items-center" href="/usr/member/myPage">MYPAGE</a></li>
 				<li class="hover:underline"><a class="h-full px-3 flex items-center" href="/usr/member/doLogout">LOGOUT</a></li>
 			</c:if>
+			<li class="hover:underline"><a class="h-full px-3 flex items-center" href="/usr/api/APITest">API</a></li>
 		</ul>
 	</div>
 	
