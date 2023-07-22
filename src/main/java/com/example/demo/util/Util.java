@@ -1,5 +1,7 @@
 package com.example.demo.util;
 
+import java.security.MessageDigest;
+
 public class Util {
 	public static boolean empty(Object obj) {
 		
@@ -22,15 +24,15 @@ public class Util {
 			msg = "";
 		}
 		
-		return f("""
-					<script>
-						const msg = '%s'.trim();
-						if (msg.length > 0) {
-							alert(msg);
-						}
-						history.back();
-					</script>
-				""", msg);
+		return Util.f("""
+						<script>
+							const msg = '%s'.trim();
+							if (msg.length > 0) {
+								alert(msg);
+							}
+							history.back();
+						</script>
+					""", msg);
 	}
 	
 	public static String jsReplace(String msg, String uri) {
@@ -43,14 +45,35 @@ public class Util {
 			uri = "";
 		}
 		
-		return f("""
-					<script>
-						const msg = '%s'.trim();
-						if (msg.length > 0) {
-							alert(msg);
-						}
-						location.replace('%s');
-					</script>
-				""", msg, uri);
+		return Util.f("""
+						<script>
+							const msg = '%s'.trim();
+							if (msg.length > 0) {
+								alert(msg);
+							}
+							location.replace('%s');
+						</script>
+					""", msg, uri);
+	}
+	
+	public static String sha256(String originalPw) {
+		
+		try {
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			byte[] hash = digest.digest(originalPw.getBytes("UTF-8"));
+			StringBuffer hexString = new StringBuffer();
+
+			for (int i = 0; i < hash.length; i++) {
+				String hex = Integer.toHexString(0xff & hash[i]);
+				if (hex.length() == 1)
+					hexString.append('0');
+				hexString.append(hex);
+			}
+
+			return hexString.toString();
+
+		} catch (Exception ex) {
+			return "";
+		}
 	}
 }

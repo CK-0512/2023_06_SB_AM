@@ -1,221 +1,195 @@
-DROP DATABASE IF EXISTS SB_AM;
-CREATE DATABASE SB_AM;
-USE SB_AM;
+package com.example.demo.controller;
 
-CREATE TABLE article(
-    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    regDate DATETIME NOT NULL,
-    updateDate DATETIME NOT NULL,
-    title VARCHAR(100) NOT NULL,
-    `body` TEXT NOT NULL
-);
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-ALTER TABLE article ADD COLUMN memberId INT UNSIGNED NOT NULL AFTER updateDate;
-ALTER TABLE article ADD COLUMN boardId INT UNSIGNED NOT NULL AFTER memberId;
-ALTER TABLE article ADD COLUMN hitCnt INT UNSIGNED NOT NULL DEFAULT 0;
+import com.example.demo.service.MemberService;
+import com.example.demo.util.Util;
+import com.example.demo.vo.Member;
+import com.example.demo.vo.ResultData;
+import com.example.demo.vo.Rq;
 
-CREATE TABLE `member`(
-    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    regDate DATETIME NOT NULL,
-    updateDate DATETIME NOT NULL,
-    loginId VARCHAR(20) NOT NULL UNIQUE,
-    loginPw VARCHAR(100) NOT NULL,
-    `authLevel` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '권한 레벨 (일반 = 1, 관리자 = 3)',
-    `name` VARCHAR(20) NOT NULL,
-    nickname VARCHAR(20) NOT NULL,
-    cellphoneNum VARCHAR(20) NOT NULL,
-    email VARCHAR(50) NOT NULL,
-    delStatus TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '탈퇴여부 (탈퇴 전 = 0, 탈퇴 후 = 1)',
-    delDate DATETIME COMMENT '탈퇴 날짜'
-);
+@Controller
+public class UsrMemberController {
+	
+	private MemberService memberService;
+	private Rq rq;
+	
+	@Autowired
+	public UsrMemberController(MemberService memberService, Rq rq) {
+		this.memberService = memberService;
+		this.rq = rq;
+	}
+	
+	@RequestMapping("/usr/member/join")
+	public String join() {
+		return "usr/member/join";
+	}
+	
+	// 액션 메서드
+	@RequestMapping("/usr/member/doJoin")
+	@ResponseBody
+	public String doJoin(String loginId, String loginPw, String loginPwChk, String name, String nickname, String cellphoneNum, String email) {
+		
+		if(Util.empty(loginId)) {
+			return Util.jsHistoryBack("아이디를 입력해주세요");
+		}
+		if(Util.empty(loginPw)) {
+			return Util.jsHistoryBack("비밀번호를 입력해주세요");
+		}
+		if(Util.empty(loginPwChk)) {
+			return Util.jsHistoryBack("비밀번호 확인을 입력해주세요");
+		}
+		if(Util.empty(name)) {
+			return Util.jsHistoryBack("이름을 입력해주세요");
+		}
+		if(Util.empty(nickname)) {
+			return Util.jsHistoryBack("닉네임을 입력해주세요");
+		}
+		if(Util.empty(cellphoneNum)) {
+			return Util.jsHistoryBack("전화번호를 입력해주세요");
+		}
+		if(Util.empty(email)) {
+			return Util.jsHistoryBack("이메일을 입력해주세요");
+		}
+		
+		ResultData<Member> doJoinRd = memberService.doJoin(loginId, Util.sha256(loginPw), name, nickname, cellphoneNum, email);
+		
+		if (doJoinRd.isFail()) {
+			return Util.jsHistoryBack(doJoinRd.getMsg());
+		}
+		
+		return Util.jsReplace(doJoinRd.getMsg(), "login");
+	}
+	
+	@RequestMapping("/usr/member/loginIdDupChk")
+	@ResponseBody
+	public ResultData<String> loginIdDupChk(String loginId) {
+		
+		if(Util.empty(loginId)) {
+			return ResultData.from("F-1", "아이디를 입력해주세요");
+		}
+		
+		Member member = memberService.getMemberByLoginId(loginId);
+		
+		if (member != null) {
+			return ResultData.from("F-2", "이미 사용중인 아이디입니다", "loginId", loginId);
+		}
+		
+		return ResultData.from("S-1", "사용 가능한 아이디 입니다", "loginId", loginId);
+	}
+	
+	@RequestMapping("/usr/member/login")
+	public String login() {
+		return "usr/member/login";
+	}
+	
+	@RequestMapping("/usr/member/doLogin")
+	@ResponseBody
+	public String doLogin(String loginId, String loginPw) {
+		
+		if(rq.getLoginedMemberId() != 0) {
+			return Util.jsHistoryBack("로그아웃 후 이용해주세요");
+		}
+		
+		if(Util.empty(loginId)) {
+			return Util.jsHistoryBack("아이디를 입력해주세요");
+		}
+		if(Util.empty(loginPw)) {
+			return Util.jsHistoryBack("비밀번호를 입력해주세요");
+		}
+		
+		Member member = memberService.getMemberByLoginId(loginId);
+		
+		if (member == null) {
+			return Util.jsHistoryBack(Util.f("%s은(는) 존재하지 않는 아이디입니다", loginId));
+		}
+		
+		if (member.getLoginPw().equals(Util.sha256(loginPw)) == false) {
+			return Util.jsHistoryBack("비밀번호가 일치하지 않습니다");
+		}
 
-CREATE TABLE board(
-    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    regDate DATETIME NOT NULL,
-    updateDate DATETIME NOT NULL,
-    `code` VARCHAR(20) NOT NULL UNIQUE COMMENT 'notice(공지사항), free(자유), ...',
-    `name` VARCHAR(20) NOT NULL UNIQUE COMMENT '게시판 이름',
-    delStatus TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '삭제여부 (삭제 전 = 0, 삭제 후 = 1)',
-    delDate DATETIME COMMENT '삭제 날짜'
-);
-
-CREATE TABLE reactionPoint (
-    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    regDate DATETIME NOT NULL,
-    updateDate DATETIME NOT NULL,
-    memberId INT UNSIGNED NOT NULL,
-    relTypeCode VARCHAR(20) NOT NULL COMMENT '관련 데이터 타입 코드',
-    relId INT UNSIGNED NOT NULL COMMENT '관련 데이터 번호',
-    `point` INT NOT NULL DEFAULT 0
-);
-
-CREATE TABLE reply (
-    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    regDate DATETIME NOT NULL,
-    updateDate DATETIME NOT NULL,
-    memberId INT UNSIGNED NOT NULL,
-    relTypeCode VARCHAR(20) NOT NULL COMMENT '관련 데이터 타입 코드',
-    relId INT UNSIGNED NOT NULL COMMENT '관련 데이터 번호',
-    `body` TEXT NOT NULL
-);
-
-INSERT INTO article
-SET regDate = NOW(),
-updateDate = NOW(),
-memberId = 2,
-boardId = 2,
-title = '제목1',
-`body` = '내용1';
-
-INSERT INTO article
-SET regDate = NOW(),
-updateDate = NOW(),
-memberId = 2,
-boardId = 2,
-title = '제목2',
-`body` = '내용2';
-
-INSERT INTO article
-SET regDate = NOW(),
-updateDate = NOW(),
-memberId = 1,
-boardId = 1,
-title = '제목4',
-`body` = '내용4';
-
-INSERT INTO `member`
-SET regDate = NOW(),
-updateDate = NOW(),
-loginId = 'admin',
-loginPw = 'admin',
-authLevel = 3,
-`name` = 'admin',
-nickname = 'admin',
-cellphoneNum = '01022222222',
-email = 'admin@gmail.com';
-
-INSERT INTO `member`
-SET regDate = NOW(),
-updateDate = NOW(),
-loginId = 'test',
-loginPw = 'test',
-`name` = 'test',
-nickname = 'test',
-cellphoneNum = '01011112222',
-email = 'test@gmail.com';
-
-INSERT INTO `member`
-SET regDate = NOW(),
-updateDate = NOW(),
-loginId = 'test1',
-loginPw = 'test1',
-`name` = 'test1',
-nickname = 'test1',
-cellphoneNum = '01033332222',
-email = 'test1@gmail.com';
-
-INSERT INTO board
-SET regDate = NOW(),
-updateDate = NOW(),
-`code` = 'notice',
-`name` = '공지사항';
-
-INSERT INTO board
-SET regDate = NOW(),
-updateDate = NOW(),
-`code` = 'free',
-`name` = '자유';
-
-# 2번 회원이 1번 글에 좋아요
-INSERT INTO reactionPoint
-SET regDate = NOW(),
-updateDate = NOW(),
-memberId = 2,
-relTypeCode = 'article',
-relId = 1,
-`point` = 1;
-
-# 2번 회원이 2번 글에 싫어요
-INSERT INTO reactionPoint
-SET regDate = NOW(),
-updateDate = NOW(),
-memberId = 2,
-relTypeCode = 'article',
-relId = 2,
-`point` = -1;
-
-# 2번 회원이 3번 글에 싫어요
-INSERT INTO reactionPoint
-SET regDate = NOW(),
-updateDate = NOW(),
-memberId = 2,
-relTypeCode = 'article',
-relId = 3,
-`point` = -1;
-
-# 3번 회원이 2번 글에 좋아요
-INSERT INTO reactionPoint
-SET regDate = NOW(),
-updateDate = NOW(),
-memberId = 3,
-relTypeCode = 'article',
-relId = 2,
-`point` = 1;
-
-# 3번 회원이 3번 글에 좋아요
-INSERT INTO reactionPoint
-SET regDate = NOW(),
-updateDate = NOW(),
-memberId = 3,
-relTypeCode = 'article',
-relId = 3,
-`point` = 1;
-
-INSERT INTO reply
-SET regDate = NOW(),
-updateDate = NOW(),
-memberId = 2,
-relTypeCode = 'article',
-relId = 2,
-`body` = '댓글1';
-
-INSERT INTO reply
-SET regDate = NOW(),
-updateDate = NOW(),
-memberId = 2,
-relTypeCode = 'article',
-relId = 2,
-`body` = '댓글2';
-
-INSERT INTO reply
-SET regDate = NOW(),
-updateDate = NOW(),
-memberId = 3,
-relTypeCode = 'article',
-relId = 2,
-`body` = '댓글3';
-
-INSERT INTO reply
-SET regDate = NOW(),
-updateDate = NOW(),
-memberId = 3,
-relTypeCode = 'article',
-relId = 3,
-`body` = '댓글4';
-
-SELECT * FROM article ORDER BY id DESC;
-SELECT * FROM `member`;
-SELECT * FROM board;
-SELECT * FROM reactionPoint;
-SELECT * FROM reply;
-
-SELECT LAST_INSERT_ID();
-
-/*
-insert into article
-(
-    regDate, updateDate, memberId, boardId, title, `body`
-)
-select now(), now(), FLOOR(RAND() * 2) + 1, FLOOR(RAND() * 2) + 1, concat('제목_', rand()), CONCAT('내용_', RAND())
-from article
-*/
+		rq.login(member);
+		
+		return Util.jsReplace(Util.f("%s님 환영합니다~", member.getNickname()), "/");
+	}
+	
+	@RequestMapping("/usr/member/doLogout")
+	@ResponseBody
+	public String doLogout() {
+		
+		rq.logout();
+		
+		return Util.jsReplace("정상적으로 로그아웃 되었습니다", "/");
+	}
+	
+	@RequestMapping("/usr/member/myPage")
+	public String myPage() {
+		return "usr/member/myPage";
+	}
+	
+	@RequestMapping("/usr/member/passwordChk")
+	public String passwordChk() {
+		return "usr/member/passwordChk";
+	}
+	
+	@RequestMapping("/usr/member/doPasswordChk")
+	public String doPasswordChk(String loginPw) {
+		
+		if (Util.empty(loginPw)) {
+			return rq.jsReturnOnView("비밀번호를 입력해주세요");
+		}
+		
+		if (rq.getLoginedMember().getLoginPw().equals(Util.sha256(loginPw)) == false) {
+			return rq.jsReturnOnView("비밀번호가 일치하지 않습니다");
+		}
+		
+		return "usr/member/modify";
+	}
+	
+	@RequestMapping("/usr/member/doModify")
+	@ResponseBody
+	public String doModify(String nickname, String cellphoneNum, String email) {
+		
+		if (Util.empty(nickname)) {
+			return Util.jsHistoryBack("닉네임을 입력해주세요");
+		}
+		if (Util.empty(cellphoneNum)) {
+			return Util.jsHistoryBack("전화번호를 입력해주세요");
+		}
+		if (Util.empty(email)) {
+			return Util.jsHistoryBack("이메일을 입력해주세요");
+		}
+		
+		memberService.doModify(rq.getLoginedMemberId(), nickname, cellphoneNum, email);
+		
+		return Util.jsReplace("회원정보가 수정되었습니다", "myPage");
+	}
+	
+	@RequestMapping("/usr/member/passwordModify")
+	public String passwordModify() {
+		return "usr/member/passwordModify";
+	}
+	
+	@RequestMapping("/usr/member/doPasswordModify")
+	@ResponseBody
+	public String doPasswordModify(String loginPw, String loginPwChk) {
+		
+		if (Util.empty(loginPw)) {
+			return Util.jsHistoryBack("새 비밀번호를 입력해주세요");
+		}
+		if (Util.empty(loginPwChk)) {
+			return Util.jsHistoryBack("새 비밀번호 확인을 입력해주세요");
+		}
+		
+		if (loginPw.equals(loginPwChk) == false) {
+			return Util.jsHistoryBack("비밀번호가 일치하지 않습니다");
+		}
+		
+		memberService.doPasswordModify(rq.getLoginedMemberId(), Util.sha256(loginPw));
+		
+		return Util.jsReplace("비밀번호가 수정되었습니다", "myPage");
+	}
+}
