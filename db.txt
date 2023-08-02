@@ -59,6 +59,15 @@ CREATE TABLE reply (
     `body` TEXT NOT NULL
 );
 
+# file 테이블 생성
+CREATE TABLE `file`(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+    originName VARCHAR(50) NOT NULL,
+    savedName VARCHAR(100) NOT NULL,
+    savedPath VARCHAR(100) NOT NULL
+);
+
 INSERT INTO article
 SET regDate = NOW(),
 updateDate = NOW(),
@@ -87,7 +96,7 @@ INSERT INTO `member`
 SET regDate = NOW(),
 updateDate = NOW(),
 loginId = 'admin',
-loginPw = 'admin',
+loginPw = SHA2('admin', 256),
 authLevel = 3,
 `name` = 'admin',
 nickname = 'admin',
@@ -98,7 +107,7 @@ INSERT INTO `member`
 SET regDate = NOW(),
 updateDate = NOW(),
 loginId = 'test',
-loginPw = 'test',
+loginPw = SHA2('test', 256),
 `name` = 'test',
 nickname = 'test',
 cellphoneNum = '01011112222',
@@ -108,7 +117,7 @@ INSERT INTO `member`
 SET regDate = NOW(),
 updateDate = NOW(),
 loginId = 'test1',
-loginPw = 'test1',
+loginPw = SHA2('test1', 256),
 `name` = 'test1',
 nickname = 'test1',
 cellphoneNum = '01033332222',
@@ -208,6 +217,7 @@ SELECT * FROM `member`;
 SELECT * FROM board;
 SELECT * FROM reactionPoint;
 SELECT * FROM reply;
+SELECT * FROM `file`;
 
 SELECT LAST_INSERT_ID();
 

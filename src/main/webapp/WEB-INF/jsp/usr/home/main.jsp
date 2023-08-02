@@ -18,6 +18,7 @@
 			</div>
 			<div>
 				<span class="modal-exam">모달예시</span>
+				<span class="modal-exam">모달예시2</span>
 			</div>
 			<div>
 				<span class="popUp-exam">팝업예시</span>
@@ -29,6 +30,17 @@
 				<span class="close-x-btn">&times;</span>
 				<div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reiciendis culpa nobis reprehenderit quam veritatis tenetur ex possimus aliquam officia at iste odio impedit ipsum dicta eaque harum maxime voluptatibus hic.</div>
 				<button id="closeBtn" class="btn btn-accent btn-sm">CLOSE</button>
+			</div>
+			
+			<div>
+				<form action="upload" method="POST" enctype="multipart/form-data">
+					<input type="file" name="file" />
+					<button>업로드</button>
+				</form>
+			</div>
+			
+			<div>
+				<a href="/usr/home/view">파일보러가기</a>
 			</div>
 		</div>
 	</section>
